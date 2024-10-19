@@ -30,7 +30,7 @@ public class JobPostController {
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(e.getMessage());
+                    .body("An error occurred while posting job.");
         }
 
     }
@@ -50,7 +50,7 @@ public class JobPostController {
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(e.getMessage());
+                    .body("An error occurred while updating job.");
         }
     }
 
