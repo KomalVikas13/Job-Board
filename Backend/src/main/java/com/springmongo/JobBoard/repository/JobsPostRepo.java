@@ -5,5 +5,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface JobsRepo extends MongoRepository<Job, String> {
+public interface JobsPostRepo extends MongoRepository<Job, String> {
 }
