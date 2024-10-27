@@ -31,7 +31,7 @@ public class UserService {
             user.setAccessRoles(Set.of("ROLE_ADMIN").toArray(new String[0]));
         }
         repo.save(user);
-        return user.getUserName();
+        return user.getStatus();
     }
 
     private String usernameGenerator(String fullName) {

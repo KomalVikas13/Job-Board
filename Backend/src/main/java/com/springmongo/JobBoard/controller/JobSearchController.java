@@ -25,7 +25,7 @@ public class JobSearchController {
     }
 
 
-    @GetMapping("/")
+    @GetMapping("/jobs")
     public ResponseEntity<?> jobList(){
         try {
             List<Job> jobs = jobSearchService.getJobs();
@@ -39,7 +39,7 @@ public class JobSearchController {
         }
     }
 
-    @GetMapping("/{text}")
+    @GetMapping("/jobs/{text}")
     public ResponseEntity<?> searchJob(@PathVariable String text){
         try{
             List<Job> jobs = jobSearchService.searchJob(text);
