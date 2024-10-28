@@ -87,7 +87,7 @@ const Home = () => {
                             <p><span className="font-bold">Company:</span> {job.company}</p>
                             <p><span className="font-bold">Job Description:</span> {job.jobDescription}</p>
                             <p><span className="font-bold">Experience:</span> {job.experience} year(s)</p>
-                            <p><span className="font-bold">Skills:</span> 
+                            <p><span className="font-bold">Skills: </span> 
                                 {job.skills.map((skill, skillIndex) => (
                                     <span key={skillIndex} className="text-gray-700">
                                         {skill}{skillIndex < job.skills.length - 1 && " | "}

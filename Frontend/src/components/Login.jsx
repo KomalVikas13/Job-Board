@@ -1,5 +1,38 @@
-const Login = () => {
+import { useState } from "react"
 
+const Login = () => {
+    const [formData, setFormData] = useState({
+        username : "",
+        password : ""
+    })
+    const [errors, setErrors] = useState({
+        username : "",
+        password : ""
+    })
+
+    const handleChange = (e) => {
+        const {name, value} = e.target;
+        setFormData(prevData => ({
+            ...prevData,
+            [name] : value
+        }))
+    }
+
+    const handleSubmit = async () => {
+        if(formData.username === ""){
+            setErrors(prevError => ({
+                ...prevError,
+                username : "Username required"
+            })) 
+        }
+        if(formData.password === ""){
+            setErrors(prevError => ({
+                ...prevError,
+                password : "Password required"
+            })) 
+        }
+
+    }
     return(
         <div className="flex flex-row">
             <div className="flex flex-col justify-center items-center mx-auto w-[50%] h-screen bg-gradient-to-br from-blue-500 to-purple-600 p-10 text-white">
@@ -14,11 +47,11 @@ const Login = () => {
                         <div className="flex flex-col items-center gap-4">
                             <div className="flex flex-col w-[80%]">
                                 <label className="font-semibold">Username:</label>
-                                <input className="border rounded-lg p-2 mt-1" type="text" placeholder="Eg: ADM12"></input>
+                                <input name="username" value={formData.username} onChange={handleChange} className="border rounded-lg p-2 mt-1" type="text" placeholder="Eg: ADM12"></input>
                             </div>
                             <div className="flex flex-col w-[80%]">
                                 <label className="font-semibold">Password:</label>
-                                <input className="border rounded-lg p-2 mt-1" type="password" placeholder="Eg: user@145"></input>
+                                <input name="password" value={formData.password} onChange={handleChange} className="border rounded-lg p-2 mt-1" type="password" placeholder="Eg: user@145"></input>
                             </div>
                             <p className="w-[80%] text-end text-blue-800"><a href="">Forgot password?</a></p>
                             <button className="outline-none hover:scale-110 transition duration-300 ease-in-out border rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-10 text-white py-1 mt-2 w-[80%] font-semibold">Login</button>
