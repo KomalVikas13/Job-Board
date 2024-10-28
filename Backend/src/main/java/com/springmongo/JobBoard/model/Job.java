@@ -20,4 +20,5 @@ public class Job {
     private int experience;
     private String jobDescription;
     private String[] skills;
+    private String postedBy; // Recruiter ID
 }
