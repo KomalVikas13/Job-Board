@@ -1,3 +1,4 @@
+import axios from "axios"
 import { useState } from "react"
 
 const Login = () => {
@@ -18,20 +19,30 @@ const Login = () => {
         }))
     }
 
-    const handleSubmit = async () => {
-        if(formData.username === ""){
-            setErrors(prevError => ({
-                ...prevError,
-                username : "Username required"
-            })) 
-        }
-        if(formData.password === ""){
-            setErrors(prevError => ({
-                ...prevError,
-                password : "Password required"
-            })) 
-        }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        console.log(formData)
+        // if(formData.username === ""){
+        //     setErrors(prevError => ({
+        //         ...prevError,
+        //         username : "Username required"
+        //     })) 
+        // }
+        // if(formData.password === ""){
+        //     setErrors(prevError => ({
+        //         ...prevError,
+        //         password : "Password required"
+        //     })) 
+        // }
+        try {
+            const response = await axios.post('http://localhost:8096/auth/login', formData, {
+                withCredentials: true,
+            });
 
+            console.log(response)
+        } catch (error) {
+            console.log(error)
+        }
     }
     return(
         <div className="flex flex-row">
@@ -54,7 +65,7 @@ const Login = () => {
                                 <input name="password" value={formData.password} onChange={handleChange} className="border rounded-lg p-2 mt-1" type="password" placeholder="Eg: user@145"></input>
                             </div>
                             <p className="w-[80%] text-end text-blue-800"><a href="">Forgot password?</a></p>
-                            <button className="outline-none hover:scale-110 transition duration-300 ease-in-out border rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-10 text-white py-1 mt-2 w-[80%] font-semibold">Login</button>
+                            <button onClick={handleSubmit} className="outline-none hover:scale-110 transition duration-300 ease-in-out border rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-10 text-white py-1 mt-2 w-[80%] font-semibold">Login</button>
                         </div>
                     </form>
 
