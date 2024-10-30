@@ -44,7 +44,8 @@ public class SecurityConfig {
                         .requestMatchers("/recruiter/**").hasAnyRole("RECRUITER", "ADMIN")
                         .requestMatchers("/api/csrf-token").authenticated()
                         .anyRequest().authenticated()
-                );
+                )
+                ;
 //                .formLogin(form -> form
 //                        .successHandler(customSuccessHandler())
 //                        .failureHandler(customFailureHandler())

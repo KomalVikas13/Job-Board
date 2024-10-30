@@ -1,19 +1,49 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Home from './components/Home'
-import Login from './components/Login'
-import {Routes, Route} from 'react-router-dom'
+import Home from './components/Home';
+import Login from './components/Login';
+import { Routes, Route } from 'react-router-dom';
+import { AuthProvider, useAuth } from './components/AuthContext';
+import UserPortal from './components/UserPortal';
+import PostJob from './components/PostJob';
+import { CsrfProvider } from './components/CsrfContext';
 
-function App() {
+function AppRoutes() {
+  const { isAuthenticated } = useAuth();
 
   return (
     <Routes>
-        <Route path="/" element={<Home></Home>}></Route>
-        <Route path="/login" element={<Login></Login>}></Route>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      
+      {isAuthenticated && (
+        <>
+          <Route 
+            path="/user-portal" 
+            element={
+              <CsrfProvider>
+                <UserPortal />
+              </CsrfProvider>
+            } 
+          />
+          <Route 
+            path="/post-job" 
+            element={
+              <CsrfProvider>
+                <PostJob />
+              </CsrfProvider>
+            } 
+          />
+        </>
+      )}
     </Routes>
-  )
+  );
 }
 
-export default App
+function App() {
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
+  );
+}
+
+export default App;

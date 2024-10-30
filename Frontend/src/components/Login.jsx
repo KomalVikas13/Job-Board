@@ -1,5 +1,6 @@
 import axios from "axios"
 import { useState } from "react"
+import { useAuth } from "./AuthContext"
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -11,6 +12,9 @@ const Login = () => {
         password : ""
     })
 
+    const { login } = useAuth()
+
+
     const handleChange = (e) => {
         const {name, value} = e.target;
         setFormData(prevData => ({
@@ -21,28 +25,7 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(formData)
-        // if(formData.username === ""){
-        //     setErrors(prevError => ({
-        //         ...prevError,
-        //         username : "Username required"
-        //     })) 
-        // }
-        // if(formData.password === ""){
-        //     setErrors(prevError => ({
-        //         ...prevError,
-        //         password : "Password required"
-        //     })) 
-        // }
-        try {
-            const response = await axios.post('http://localhost:8096/auth/login', formData, {
-                withCredentials: true,
-            });
-
-            console.log(response)
-        } catch (error) {
-            console.log(error)
-        }
+        await login(formData.username, formData.password)
     }
     return(
         <div className="flex flex-row">
