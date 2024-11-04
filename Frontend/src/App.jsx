@@ -26,11 +26,12 @@ function AppRoutes() {
 
 function App() {
   return (
-    <CsrfProvider>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </CsrfProvider>
+    // <CsrfProvider>
+      // <AuthProvider>
+      //   <AppRoutes />
+      // </AuthProvider>
+    // </CsrfProvider>
+    <PostJob></PostJob>
   );
 }
 
