@@ -16,22 +16,8 @@ function AppRoutes() {
       
       {isAuthenticated && (
         <>
-          <Route 
-            path="/user-portal" 
-            element={
-              <CsrfProvider>
-                <UserPortal />
-              </CsrfProvider>
-            } 
-          />
-          <Route 
-            path="/post-job" 
-            element={
-              <CsrfProvider>
-                <PostJob />
-              </CsrfProvider>
-            } 
-          />
+          <Route path="/user-portal" element={<UserPortal />} />
+          <Route path="/post-job" element={<PostJob />} />
         </>
       )}
     </Routes>
@@ -40,9 +26,11 @@ function AppRoutes() {
 
 function App() {
   return (
-    <AuthProvider>
-      <AppRoutes />
-    </AuthProvider>
+    <CsrfProvider>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </CsrfProvider>
   );
 }
 

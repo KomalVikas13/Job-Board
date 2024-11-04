@@ -1,77 +1,94 @@
 package com.springmongo.JobBoard.config;
 
+import com.springmongo.JobBoard.utility.JwtUtil;
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
     private UserDetailsService userDetailsService;
 
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(12);
-    }
+//    @PostConstruct
+//    public void init() {
+//        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_THREADLOCAL);
+//    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/public/**", "/auth/login"))
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/public/**").permitAll()
-                        .requestMatchers("/auth/login").permitAll() // Allow access to login endpoint
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/csrf-token").permitAll()
                         .requestMatchers("/recruiter/**").hasAnyRole("RECRUITER", "ADMIN")
-                        .requestMatchers("/api/csrf-token").authenticated()
                         .anyRequest().authenticated()
                 )
-                ;
-//                .formLogin(form -> form
-//                        .successHandler(customSuccessHandler())
-//                        .failureHandler(customFailureHandler())
-//                );
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint((request, response, ex) -> {
+                            response.setContentType("application/json");
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.getWriter().write("{\"error\": \"Authentication failed\"}");
+                        })
+                        .accessDeniedHandler((request, response, ex) -> {
+                            response.setContentType("application/json");
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.getWriter().write("{\"error\": \"Access denied\"}");
+                        })
+                )
+                .addFilterBefore(
+                        jwtAuthenticationFilter(),
+                        UsernamePasswordAuthenticationFilter.class
+                );
+
         return http.build();
     }
 
-
     @Bean
-    public AuthenticationSuccessHandler customSuccessHandler() {
-        return (request, response, authentication) -> {
-            response.setContentType("application/json");
-            response.getWriter().write("{\"message\": \"Login successful\"}");
-            response.setStatus(HttpServletResponse.SC_OK);
-        };
+    public JwtAuthFilter jwtAuthenticationFilter() {
+        return new JwtAuthFilter(jwtUtil, userDetailsService);
     }
 
     @Bean
-    public AuthenticationFailureHandler customFailureHandler() {
-        return (request, response, exception) -> {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.setContentType("application/json");
-            response.getWriter().write("{\"error\": \"Invalid credentials\"}");
-        };
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(12);
     }
-
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -93,6 +110,7 @@ public class SecurityConfig {
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
         config.setAllowCredentials(true);
+        config.setExposedHeaders(Arrays.asList("Authorization"));  // Added Authorization header
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;

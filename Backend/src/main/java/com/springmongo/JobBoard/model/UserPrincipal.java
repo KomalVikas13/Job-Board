@@ -20,10 +20,9 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
         return user.getAccessRoles() != null ?
                 Arrays.stream(user.getAccessRoles())
-                        .map(SimpleGrantedAuthority::new)
+                        .map(role -> new SimpleGrantedAuthority(role)) // Ensure roles include "ROLE_" prefix
                         .collect(Collectors.toList())
                 : List.of();
     }

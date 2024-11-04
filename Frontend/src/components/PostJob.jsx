@@ -1,6 +1,9 @@
+import axios from "axios";
 import { useState } from "react";
+import { useCsrf } from "./CsrfContext";
 
 const PostJob = () => {
+    const { csrfToken } = useCsrf()
     const [formData, setFormData] = useState({
         jobId: "",
         role: "",
@@ -19,9 +22,23 @@ const PostJob = () => {
         }));
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("Form Data:", formData); // skills should now be an array
+        try {
+            console.log(csrfToken)
+            const response = await axios.post(`http://localhost:8096/recruiter/postJob`,formData,{
+                withCredentials : true,
+                headers : {
+                    'X-XSRF-TOKEN': csrfToken,
+                    'Content-Type': 'application/json'
+                }
+            })
+            console.log(response)
+            
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     return (
